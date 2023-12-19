@@ -9,7 +9,10 @@
 
 void interrupts_init(void) {
 
-
+  GIE = 1;
+  PEIE = 1;
+  CMIE = 1;
+  TMR1IE = 1;
 
 }
 

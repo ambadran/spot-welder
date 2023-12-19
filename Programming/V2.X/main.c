@@ -27,3 +27,22 @@ void main(void) {
 
   return ;
 }
+
+
+void __interrupt() ISR(void) {
+
+  if(TMR1IF) {
+
+    timer1_ISR();
+    TMR1IF = 0;
+
+  }
+
+  if(CMIF) {
+
+    comparators_ISR();
+    CMIF = 0;
+
+  }
+
+}

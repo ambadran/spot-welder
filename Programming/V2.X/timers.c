@@ -12,3 +12,9 @@ void timers1_init(void) {
 
 
 }
+
+void timer1_ISR(void) {
+
+
+
+}
