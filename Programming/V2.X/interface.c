@@ -9,6 +9,9 @@
 
 void interface_init(void) {
 
-
+  lcd_set_cursor(1, 1);
+  lcd_write_string("  test1");
+  lcd_set_cursor(2, 1);
+  lcd_write_string("   test2");
 
 }

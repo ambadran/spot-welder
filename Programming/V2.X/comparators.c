@@ -9,7 +9,7 @@
 
 void comparators_init(void) {
 
-
+  CMCONbits.CM = 0b111; // temp shutdown
 
 }
 

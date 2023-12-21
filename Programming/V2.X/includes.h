@@ -9,9 +9,10 @@
 #include "cpu_map.h"
 #include "interrupts.h"
 #include "comparators.h"
-#include "gpio.h"
 #include "timers.h"
 #include "uart.h"
 #include "lcd.h"
+#include "buttons.h"
+#include "CD_control.h"
 #include "interface.h"
 

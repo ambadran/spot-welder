@@ -9,6 +9,11 @@
 
 void interrupts_init(void) {
 
+  // setting internal oscillator to 4Mhz
+  // I really don't want to make a specific file for this, so will write it here
+  OSCF = 1;
+
+  // interrupt enable bits
   GIE = 1;
   PEIE = 1;
   CMIE = 1;
