@@ -8,7 +8,10 @@
 /* ********************** */
 
 /*** User configs ***/
+#define DEFAULT_CHARGE_TIME 2000
+#define DEFAULT_DISCHARGE_TIME 2000
 
+#define DEBOUNCE_TIME 300
 /* ********************** */
 
 /*** compile checks ***/

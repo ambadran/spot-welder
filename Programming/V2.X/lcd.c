@@ -7,21 +7,6 @@
 
 #include "includes.h"
 
-
-void lcd_SL() {
-
-  lcd_cmd(0x01);
-  lcd_cmd(0x08);
-
-}
-
-void lcd_SR() {
-
-  lcd_cmd(0x01);
-  lcd_cmd(0x0C);
-
-}
-
 void lcd_cmd(uint8_t CMD) {
   // Select Command Register
   RS = 0;
@@ -107,4 +92,16 @@ void lcd_write_string(char *str) {
   for(i=0;str[i]!='\0';i++)
     lcd_write_char(str[i]);
 }
+
+// NEVER USED
+/* void lcd_SL() { */
+/*   lcd_cmd(0x01); */
+/*   lcd_cmd(0x08); */
+/* } */
+
+/* void lcd_SR() { */
+/*   lcd_cmd(0x01); */
+/*   lcd_cmd(0x0C); */
+/* } */
+
 

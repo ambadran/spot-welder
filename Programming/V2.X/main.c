@@ -11,7 +11,7 @@ void main(void) {
 
   // inits / deinits
   interrupts_init();
-  comparators_init();
+  comparators_deinit();
   timers1_init();
   uart_init();
   lcd_init();
@@ -22,26 +22,32 @@ void main(void) {
   // Main Routine
   while (1) {
 
-    if(ARROW_KEY) {
+    if(read_button(ARROW_KEY_PIN_NUM)) {
       lcd_clear();
       lcd_set_cursor(1, 1);
       lcd_write_string("Arrow key");
-      __delay_ms(300);
+      __delay_ms(100); // without this the lcd will fuck up
+
+      charge_CD();
+
     }
 
-    if(ENTER_KEY) {
+    if(read_button(ENTER_KEY_PIN_NUM)) {
       lcd_clear();
       lcd_set_cursor(1, 1);
       lcd_write_string("Enter key");
-      __delay_ms(300);
+      __delay_ms(100); // without this the lcd will fuck up
+
+      discharge_CD();
+
     }
 
-    if(WELD_KEY) {
+    if(read_button(WELD_KEY_PIN_NUM)) {
       lcd_clear();
       lcd_set_cursor(1, 1);
       lcd_write_string("Weld key");
-      __delay_ms(300);
-
+      __delay_ms(100); // without this the lcd will fuck up
+                       //
     }
 
 
@@ -58,13 +64,6 @@ void __interrupt() ISR(void) {
 
     timer1_ISR();
     TMR1IF = 0;
-
-  }
-
-  if(CMIF) {
-
-    comparators_ISR();
-    CMIF = 0;
 
   }
 
