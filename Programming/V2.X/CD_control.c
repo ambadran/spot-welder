@@ -24,7 +24,7 @@ void _end_discharging(void) { DISCHARGE_PIN = 0; }
 void charge_CD(void) {
 
   _start_charging();
-  add_timer1_task(charge_time, &_end_charging);
+  push_task(&tasks, &_end_charging, charge_time, void_func_arg);
 
 }
 
@@ -32,6 +32,6 @@ void charge_CD(void) {
 void discharge_CD(void) {
 
   _start_discharging();
-  add_timer1_task(charge_time, &_end_discharging);
+  push_task(&tasks, &_end_discharging, discharge_time, void_func_arg);
 
 }

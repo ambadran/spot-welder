@@ -38,18 +38,18 @@ void _enable_button(uint8_t port_pin) {
 // This function has button debounce software implementation
 // where a timer task starts upon a button press to close
 // inputs from timer until debounce period is finished
-uint8_t read_button(uint8_t port_pin) {
+button_state_t read_button(uint8_t port_pin) {
 
   
   if ((BUTTON_PORT >> port_pin) & 0b1) {
 
     _disable_button(port_pin);
-    add_timer1_task_with_arg(DEBOUNCE_TIME, &_enable_button, port_pin);
-    return 1;
+    push_task(&tasks, &_enable_button, DEBOUNCE_TIME, init_uint8_func_arg(port_pin));
+    return BUTTON_PRESSED;
 
   } else {
 
-    return 0;
+    return BUTTON_NOT_PRESSED;
 
   }
 

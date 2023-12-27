@@ -25,18 +25,3 @@ void timer1_ISR(void) {
 }
 
 
-// executes &func_ptr after time in ms :D 
-void add_timer1_task(uint16_t time, void (*func_ptr)()) {
-
-  __delay_ms(2000);
-  func_ptr();
-
-}
-
-// executes &func_ptr with its argument :D
-void add_timer1_task_with_arg(uint16_t time, void (*func_ptr)(), uint8_t func_arg) {
-
-  __delay_ms(2000);
-  func_ptr(func_arg);
-
-}

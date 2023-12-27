@@ -17,6 +17,7 @@ void main(void) {
   lcd_init();
   buttons_init();
   CD_control_init();
+  tasks_init();
   interface_init();
 
   // Main Routine

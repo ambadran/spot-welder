@@ -14,5 +14,6 @@
 #include "lcd.h"
 #include "buttons.h"
 #include "CD_control.h"
+#include "tasks.h"
 #include "interface.h"
 
