@@ -7,16 +7,7 @@
 
 #include "includes.h"
 
-// GLOBAL VARIABLES
-const func_arg_t void_func_arg = {ARG_VOID};
-
 // **************************************** TASK MANAGER IMPLEMENTATION START ************************************* //
-func_arg_t init_uint8_func_arg(uint8_t value) {
-  func_arg_t tmp;
-  tmp.type = ARG_UINT8;
-  tmp.value.uint8_val = value;
-  return tmp;
-}
 
 void init_tasks(tasks_t* tasks) {
 
@@ -29,18 +20,20 @@ void init_tasks(tasks_t* tasks) {
   tasks->size_funcs = 0;
 
   for (int i = 0; i < MAXIMUM_TASK_NUM; ++i) {
-    tasks->func_ptrs[i] = NULL; // Assuming NULL is a suitable default value for your function pointers
-    tasks->func_args[i] = void_func_arg;
+    tasks->func_ptrs[i] = NULL;
     tasks->periods[i] = 0;   // Initialize priorities to 0 or any default value suitable for your context
   }
 
 }
 
+
 // highest value is the smallest time value
-void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t func_arg) {
+void push_task(tasks_t* tasks, uint16_t period, func_ptr_t func_ptr) {
     if (tasks->size_funcs == MAXIMUM_TASK_NUM) {
         // Handle queue overflow
         /* printf("OVERFLOW ERROR!! \n"); */
+        lcd_set_cursor(1, 1);
+        lcd_write_string("tasks overflow");
         return;
     }
 
@@ -50,7 +43,6 @@ void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t 
 
       // Insert the new element
       tasks->func_ptrs[0] = func_ptr;
-      tasks->func_args[0] = func_arg;
       tasks->size_funcs++;
 
       return;
@@ -67,7 +59,6 @@ void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t 
       tasks->periods[tasks->size_periods] = preloaded_TMR1 - period;
       tasks->size_periods++;
       tasks->func_ptrs[tasks->size_funcs] = func_ptr;
-      tasks->func_args[tasks->size_funcs] = func_arg;
       tasks->size_funcs++;
 
       return;
@@ -89,11 +80,11 @@ void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t 
     // Shift func elements to make room for the new element
     for (int8_t i = tasks->size_funcs; i > insertPos; --i) {
         tasks->func_ptrs[i] = tasks->func_ptrs[i - 1];
-        tasks->func_args[i] = tasks->func_args[i - 1];
     }
+
     // Insert the new func element
     tasks->func_ptrs[insertPos] = func_ptr;
-    tasks->func_args[insertPos] = func_arg;
+
     // Updating size of func array
     tasks->size_funcs++;
 
@@ -101,6 +92,7 @@ void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t 
     for (int8_t i = tasks->size_periods; i > insertPos; --i) {
         tasks->periods[i] = tasks->periods[i - 1];
     }
+
     // Insert the new period element
     // if period is greater than all previous times combined
     if (period > cumulativeSum) {
@@ -114,24 +106,40 @@ void push_task(tasks_t* tasks, func_ptr_t func_ptr, uint16_t period, func_arg_t 
 
 }
 
+/* void push_extended_task(tasks_t* tasks, uint32_t period, func_ptr_t func_ptr) { */
+
+/*   // accedentically passing a normal period to an extended period function */
+/*   if (period < MAXIMUM_TMR_PERIOD) { */
+
+/*     push_task(tasks, (uint16_t)period, func_ptr); */
+
+/*   } else { */
+
+/*     //TODO: develop and algorithm that will call push_task n times with correct periods to finish the long task */
+
+/*   } */
+
+/* } */
+
 void pop_task_push_func_queue_update_TMR(tasks_t* tasks, func_queue_t* func_queue) {
 
+  //TODO: use % not if
   if (tasks->size_funcs == 0) {
 
       // Handle empty queue
+
       return;
 
-  //TODO: use % not if
   } else if (tasks->size_funcs == 1) {
 
     // The last element is the one to be popped
-    push_func_q(func_queue, tasks->func_ptrs[tasks->size_funcs], tasks->func_args[tasks->size_funcs]);
+    push_func_q(func_queue, tasks->func_ptrs[tasks->size_funcs-1]);
     tasks->size_funcs--;
 
   } else {
 
     // The last element is the one to be popped
-    push_func_q(func_queue, tasks->func_ptrs[tasks->size_funcs-1], tasks->func_args[tasks->size_funcs-1]);
+    push_func_q(func_queue, tasks->func_ptrs[tasks->size_funcs-1]);
     TMR1 = PRELOAD(tasks->periods[tasks->size_periods-1]);
 
     tasks->size_funcs--;
@@ -141,26 +149,34 @@ void pop_task_push_func_queue_update_TMR(tasks_t* tasks, func_queue_t* func_queu
 
 }
 
+// **************************************** TASK MANAGER IMPLEMENTATION FINISH ************************************* //
+
+
+// **************************************** TASK HOLDER IMPLEMENTATION START ************************************* //
 void init_func_queue(func_queue_t* func_queue) {
 
   func_queue->size = 0;
   func_queue->front = 0;
   func_queue->rear = -1;
   for (int i = 0; i < MAXIMUM_TASK_NUM; ++i) {
-    func_queue->func_ptrs[i] = NULL; // Assuming NULL is a suitable default value for your function pointers
-    func_queue->func_args[i] = void_func_arg;
+    func_queue->func_ptrs[i] = NULL;
   }
 
 }
 
-void push_func_q(func_queue_t* func_queue, func_ptr_t func_ptr, func_arg_t func_arg) {
+void push_func_q(func_queue_t* func_queue, func_ptr_t func_ptr) {
 
-  if (func_queue->size == MAXIMUM_TASK_NUM) {  return; } //TODO: do sth when overflow
+  if (func_queue->size == MAXIMUM_TASK_NUM) { 
+    /* printf("Trying to push a full queue!\n"); */ 
+    return; 
+  }
 
   // Insert the new func element
   func_queue->rear = (func_queue->rear + 1) % MAXIMUM_TASK_NUM;  // The % doesn't affect rear values, but when it reaches maximum it resets the value :D
+
+  // Adding the data to the underlying func_ptr_t array
   func_queue->func_ptrs[func_queue->rear] = func_ptr;
-  func_queue->func_args[func_queue->rear] = func_arg;
+
   // Updating size of func array
   func_queue->size++;
 
@@ -168,7 +184,10 @@ void push_func_q(func_queue_t* func_queue, func_ptr_t func_ptr, func_arg_t func_
 
 func_ptr_t pop_func_q(func_queue_t* func_queue) {
 
-  if (func_queue->size == 0) { return NULL; }  //TODO: do sth when underflow
+  if (func_queue->size == 0) { 
+    /* printf("Trying to pop an empty queue!\n"); */ 
+    return NULL; 
+  }
 
   func_ptr_t func_ptr = func_queue->func_ptrs[func_queue->front];
   func_queue->front = (func_queue->front + 1) % MAXIMUM_TASK_NUM;
@@ -177,11 +196,13 @@ func_ptr_t pop_func_q(func_queue_t* func_queue) {
   return func_ptr;
 
 }
+// **************************************** TASK HOLDER IMPLEMENTATION FINISH ************************************* //
 
-void tasks_init(void) {
+
+
+void tasks_module_init(void) {
 
   init_tasks(&tasks);
-
   init_func_queue(&func_queue);
 
 }

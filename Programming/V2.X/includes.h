@@ -1,6 +1,7 @@
 
 // compiler includes
 #include <xc.h>
+#include <stddef.h> // contains NULL
 #include <stdint.h>
 
 // user-files includes

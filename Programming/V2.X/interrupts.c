@@ -16,8 +16,10 @@ void interrupts_init(void) {
   // interrupt enable bits
   GIE = 1;
   PEIE = 1;
-  CMIE = 1;
+  CMIE = 0;
+  TMR0IE = 0;
   TMR1IE = 1;
+  TMR2IE = 0;
 
 }
 

@@ -16,6 +16,7 @@ void lcd_cmd(uint8_t CMD) {
   EN = 1;
   __delay_us(LCD_EN_DELAY);
   EN = 0; 
+  __delay_us(LCD_EN_DELAY);
 }
 
 void lcd_init(void) {

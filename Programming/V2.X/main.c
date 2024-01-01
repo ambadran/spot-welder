@@ -9,49 +9,34 @@
 
 void main(void) {
 
-  // inits / deinits
+  // ** inits / deinits ** //
+  
+  // MCAL layers
   interrupts_init();
   comparators_deinit();
   timers1_init();
   uart_init();
+
+  // HAL layer
   lcd_init();
   buttons_init();
   CD_control_init();
-  tasks_init();
+
+  // Middle (RTOS) layer
+  tasks_module_init();
+
+  // Application layer
   interface_init();
 
   // Main Routine
   while (1) {
 
-    if(read_button(ARROW_KEY_PIN_NUM)) {
-      lcd_clear();
-      lcd_set_cursor(1, 1);
-      lcd_write_string("Arrow key");
-      __delay_ms(100); // without this the lcd will fuck up
+    // Executing functions in current function queue
+    while(func_queue.size != 0) { 
 
-      charge_CD();
+      pop_func_q(&func_queue)(); 
 
     }
-
-    if(read_button(ENTER_KEY_PIN_NUM)) {
-      lcd_clear();
-      lcd_set_cursor(1, 1);
-      lcd_write_string("Enter key");
-      __delay_ms(100); // without this the lcd will fuck up
-
-      discharge_CD();
-
-    }
-
-    if(read_button(WELD_KEY_PIN_NUM)) {
-      lcd_clear();
-      lcd_set_cursor(1, 1);
-      lcd_write_string("Weld key");
-      __delay_ms(100); // without this the lcd will fuck up
-                       //
-    }
-
-
   
   }
 
@@ -63,7 +48,7 @@ void __interrupt() ISR(void) {
 
   if(TMR1IF) {
 
-    timer1_ISR();
+    pop_task_push_func_queue_update_TMR(&tasks, &func_queue);
     TMR1IF = 0;
 
   }
