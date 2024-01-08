@@ -39,7 +39,6 @@ void select_thickness_routine(void) {
 
 }
 
-
 void allow_choose_thickness(void) {
 
     if (read_arrow_button() == BUTTON_PRESSED) {
